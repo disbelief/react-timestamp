@@ -2,10 +2,21 @@ export type FormatOptions = {
   format?: string;
   includeDay?: boolean;
   twentyFourHour?: boolean;
+  compact?: boolean;
 };
 
 export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 export const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+export const DAYS_COMPACT = ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat'];
+export const UNITS = {
+  second: { regular: 'second', compact: 's' },
+  minute: { regular: 'minute', compact: 'm' },
+  hour: { regular: 'hour', compact: 'h' },
+  day: { regular: 'day', compact: 'd' },
+  week: { regular: 'week', compact: 'w' },
+  month: { regular: 'month', compact: 'mo' },
+  year: { regular: 'year', compact: 'y' }
+};
 
 export const MINUTE = 60;
 export const HOUR = MINUTE * 60;
@@ -90,7 +101,8 @@ export const formatDate = (date: Date, options: FormatOptions = {}): string => {
     minutes = '' + date.getMinutes();
   }
 
-  var day = options.includeDay ? DAYS[date.getDay()] + ', ' : '';
+  let DAY_LOOKUP = options.compact ? DAYS_COMPACT : DAYS; 
+  var day = options.includeDay ? DAY_LOOKUP[date.getDay()] + ', ' : '';
 
   switch (options.format) {
     case 'date':
@@ -122,42 +134,70 @@ export const secondsBetweenDates = (date: Date, compareTo: Date): number => {
  * @param seconds The distance of time in seconds
  * @param relativeToNow Are we comparing two dates or a date and now
  */
-export const distanceOfTimeInWords = (seconds: number, relativeToNow: boolean = true): string => {
+export const distanceOfTimeInWords = (seconds: number, relativeToNow: boolean = true, compact: boolean = false): string => {
   let isAgo: boolean = seconds >= 0;
 
   seconds = Math.abs(seconds);
 
-  if (relativeToNow && seconds < 60) return isAgo ? 'just then' : 'soon';
+  if (relativeToNow && seconds < 60) return isAgo ? 'just now' : 'soon';
 
   let distance: number;
   let when: string;
 
   if (seconds < MINUTE) {
     // 1 minute
-    when = `${seconds} ${plural('second', seconds)}`;
+    if (compact) {
+      when = `${seconds}${UNITS.second.compact}`;
+    } else {
+      when = `${seconds} ${plural('second', seconds)}`;
+    }
   } else if (seconds < HOUR) {
     // 1 hour
     distance = Math.round(seconds / 60);
-    when = `${distance} ${plural('minute', distance)}`;
+    if (compact) {
+      when = `${distance}${UNITS.minute.compact}`;
+    } else {
+      when = `${distance} ${plural('minute', distance)}`;
+    }
   } else if (seconds < DAY) {
     // 1 day
     distance = Math.round(seconds / (60 * 60));
-    when = `${distance} ${plural('hour', distance)}`;
+    if (compact) {
+      when = `${distance}${UNITS.hour.compact}`;
+    } else {
+      when = `${distance} ${plural('hour', distance)}`;
+    }
   } else if (seconds < WEEK) {
     // 1 week
     distance = Math.round(seconds / (60 * 60 * 24));
-    when = `${distance} ${plural('day', distance)}`;
+    if (compact) {
+      when = `${distance}${UNITS.day.compact}`;
+    } else {
+      when = `${distance} ${plural('day', distance)}`;
+    }
   } else if (seconds < MONTH) {
     // 1 month
     distance = Math.round(seconds / (60 * 60 * 24 * 7));
-    when = `${distance} ${plural('week', distance)}`;
+    if (compact) {
+      when = `${distance}${UNITS.week.compact}`;
+    } else {
+      when = `${distance} ${plural('week', distance)}`;
+    }
   } else if (seconds < YEAR) {
     // # 1 year
     distance = Math.round(seconds / (60 * 60 * 24 * (365 / 12)));
-    when = `${distance} ${plural('month', distance)}`;
+    if (compact) {
+      when = `${distance}${UNITS.month.compact}`;
+    } else {
+      when = `${distance} ${plural('month', distance)}`;
+    }
   } else {
     distance = Math.round(seconds / (60 * 60 * 24 * 365));
-    when = `${distance} ${plural('year', distance)}`;
+    if (compact) {
+      when = `${distance}${UNITS.year.compact}`;
+    } else {
+      when = `${distance} ${plural('year', distance)}`;
+    }
   }
 
   if (!relativeToNow) {

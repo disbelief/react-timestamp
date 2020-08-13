@@ -30,10 +30,11 @@ export default (props: TimestampProps) => {
   const date: Date = possibleDate;
   const relativeTo: Date = toDate(props.relativeTo) || new Date();
   const seconds = secondsBetweenDates(date, relativeTo);
+  const compact = !!(props && props.options && props.options.compact);
   const output: string =
     !props.relative || Math.abs(seconds) > YEAR
       ? formatDate(date, props.options)
-      : distanceOfTimeInWords(seconds, !props.relativeTo);
+      : distanceOfTimeInWords(seconds, !props.relativeTo, compact);
 
   return createElement(
     Component,

@@ -48,6 +48,12 @@ export class TestFormatDate {
     Expect(Util.formatDate(date, { includeDay: true })).toBe(expectedOutput);
   }
 
+  @Test('Can format a compact date with includeDay and compact option')
+  @TestCase(new Date(2019, 2, 26, 10, 30), 'Tues, 26 Mar 2019, 10:30am')
+  public testFormatWithDayCompact(date: Date, expectedOutput: string) {
+    Expect(Util.formatDate(date, { includeDay: true, compact: true })).toBe(expectedOutput);
+  }
+
   @Test('Can format a date with 24 hour option')
   @TestCase(new Date(2019, 2, 26, 10, 30), '26 Mar 2019, 10:30')
   @TestCase(new Date(2019, 2, 26, 12, 0), '26 Mar 2019, 12:00')
@@ -61,7 +67,7 @@ export class TestFormatDate {
 export class TestSecondsBetweenDates {
   @Test('Can measure the time between two dates')
   @TestCase(new Date(2018, 2, 26, 10, 30), new Date(2018, 2, 26, 10, 0), -1800)
-  @TestCase(new Date(2000, 2, 26, 10, 30), new Date(2200, 2, 26, 10, 30), 6311347200)
+  @TestCase(new Date(2000, 2, 26, 10, 30), new Date(2200, 2, 26, 10, 30), 6311350800)
   @TestCase(new Date(2018, 2, 26, 10, 30), new Date(2018, 2, 26, 10, 30), 0)
   public testCompareWithNowWithDefaults(date: Date, otherDate: Date, expectedOutput: number) {
     Expect(Util.secondsBetweenDates(date, otherDate)).toBe(expectedOutput);
@@ -70,9 +76,26 @@ export class TestSecondsBetweenDates {
 
 export class TestDistanceOfTimeInWords {
   @Test('Can output relative times in words')
+  @TestCase(10, '10 seconds')
   @TestCase(1000, '17 minutes')
+  @TestCase(10 * 60 * 60, '10 hours')
+  @TestCase(6 * 60 * 60 * 24, '6 days')
+  @TestCase(14 * 60 * 60 * 24, '2 weeks')
+  @TestCase(2 * 30 * 60 * 60 * 24, '2 months')
   @TestCase(100000000, '3 years')
   public testComparingDates(seconds: number, expectedOutput: string) {
     Expect(Util.distanceOfTimeInWords(seconds, false)).toBe(expectedOutput);
+  }
+
+  @Test('Respects the compact option')
+  @TestCase(10, '10s')
+  @TestCase(1000, '17m')
+  @TestCase(10 * 60 * 60, '10h')
+  @TestCase(6 * 60 * 60 * 24, '6d')
+  @TestCase(14 * 60 * 60 * 24, '2w')
+  @TestCase(2 * 30 * 60 * 60 * 24, '2mo')
+  @TestCase(100000000, '3y')
+  public testComparingDatesCompact(seconds: number, expectedOutput: string) {
+    Expect(Util.distanceOfTimeInWords(seconds, false, true)).toBe(expectedOutput);
   }
 }
