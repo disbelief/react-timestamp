@@ -5,6 +5,6 @@ node_modules
 *.log
 
 # Build
-/dist
+#/dist
 .rts2_cache_*
 .cache
